@@ -1,0 +1,536 @@
+[
+    {
+        "id": "149fdcb088559175",
+        "type": "tab",
+        "label": "Assignment",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1b58eae919217c5f",
+        "type": "mqtt in",
+        "z": "149fdcb088559175",
+        "name": "",
+        "topic": "soil_health/telemetry",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "64771a0a818a9094",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "92425fa7a61da404",
+                "5d35f1597971d31a"
+            ]
+        ]
+    },
+    {
+        "id": "ed6d44c2930984b9",
+        "type": "mongodb4",
+        "z": "149fdcb088559175",
+        "clientNode": "1607aed3dacd1b10",
+        "mode": "collection",
+        "collection": "environment_telemetry",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "time-series",
+        "x": 990,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "92425fa7a61da404",
+        "type": "function",
+        "z": "149fdcb088559175",
+        "name": "Prepare Query",
+        "func": "// Simpan data asal ke dalam property 'msg.originalData'\nmsg.originalData = msg.payload;\n\n// Sediakan kueri carian\nmsg.payload = { \"sensor_id\": msg.payload.sensor_id };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
+        "wires": [
+            [
+                "94211e7ef2eb2839"
+            ]
+        ]
+    },
+    {
+        "id": "94211e7ef2eb2839",
+        "type": "mongodb4",
+        "z": "149fdcb088559175",
+        "clientNode": "1607aed3dacd1b10",
+        "mode": "collection",
+        "collection": "device_metadata",
+        "operation": "findOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 520,
+        "y": 200,
+        "wires": [
+            [
+                "2992b77390611cbe",
+                "f1da4d5d381bfaaa"
+            ]
+        ]
+    },
+    {
+        "id": "2992b77390611cbe",
+        "type": "function",
+        "z": "149fdcb088559175",
+        "name": "Validate & Timestamp",
+        "func": "// Hanya proses jika ada data suhu atau kelembapan\nif (msg.payload && (msg.payload.temperature !== undefined || msg.payload.humidity !== undefined)) {\n    \n    var now = new Date();\n    now.setHours(now.getHours() + 8); // Offset masa Malaysia [cite: 26]\n    \n    msg.payload.timestamp = now; \n    \n    return msg; \n} else {\n    return null; \n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 140,
+        "wires": [
+            [
+                "ed6d44c2930984b9",
+                "4eb70bea219df5fb",
+                "0c5c88533a7dd1da",
+                "e8fd3b7bdaf3158d"
+            ]
+        ]
+    },
+    {
+        "id": "0c5c88533a7dd1da",
+        "type": "debug",
+        "z": "149fdcb088559175",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5b7511ce3bba1799",
+        "type": "ui_gauge",
+        "z": "149fdcb088559175",
+        "name": "",
+        "group": "bf11ea157165cc0e",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperature",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1210,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "4eb70bea219df5fb",
+        "type": "change",
+        "z": "149fdcb088559175",
+        "name": "Take temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.temperature",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 220,
+        "wires": [
+            [
+                "5b7511ce3bba1799"
+            ]
+        ]
+    },
+    {
+        "id": "f1da4d5d381bfaaa",
+        "type": "debug",
+        "z": "149fdcb088559175",
+        "name": "debug 9",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "b0cf276ac0596b8e",
+        "type": "aedes broker",
+        "z": "149fdcb088559175",
+        "d": true,
+        "name": "",
+        "mqtt_port": 1883,
+        "mqtt_ws_bind": "port",
+        "mqtt_ws_port": "",
+        "mqtt_ws_path": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "persistence_bind": "memory",
+        "dburl": "",
+        "persist_to_file": false,
+        "usetls": false,
+        "x": 110,
+        "y": 40,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e8fd3b7bdaf3158d",
+        "type": "change",
+        "z": "149fdcb088559175",
+        "name": "Humidity",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.humidity",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 280,
+        "wires": [
+            [
+                "af15f078225b91f1"
+            ]
+        ]
+    },
+    {
+        "id": "af15f078225b91f1",
+        "type": "ui_chart",
+        "z": "149fdcb088559175",
+        "name": "",
+        "group": "bf11ea157165cc0e",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "label": "Humidity",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "10",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "1",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#008ff5",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#db0000",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1140,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d35f1597971d31a",
+        "type": "json",
+        "z": "149fdcb088559175",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 350,
+        "y": 140,
+        "wires": [
+            [
+                "2992b77390611cbe"
+            ]
+        ]
+    },
+    {
+        "id": "715b3b15eb086304",
+        "type": "inject",
+        "z": "149fdcb088559175",
+        "name": "ON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ON",
+        "payload": "ON",
+        "payloadType": "str",
+        "x": 90,
+        "y": 300,
+        "wires": [
+            [
+                "e3ce51ce4f08cc44",
+                "a3cbeede27edb39f"
+            ]
+        ],
+        "icon": "font-awesome/fa-circle"
+    },
+    {
+        "id": "f1674ecdbdf1c4c6",
+        "type": "inject",
+        "z": "149fdcb088559175",
+        "name": "OFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "OFF",
+        "payload": "OFF",
+        "payloadType": "str",
+        "x": 90,
+        "y": 580,
+        "wires": [
+            [
+                "e3ce51ce4f08cc44",
+                "a3cbeede27edb39f"
+            ]
+        ],
+        "icon": "font-awesome/fa-circle-thin"
+    },
+    {
+        "id": "a3cbeede27edb39f",
+        "type": "mqtt out",
+        "z": "149fdcb088559175",
+        "name": "",
+        "topic": "soil_health/command",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "64771a0a818a9094",
+        "x": 780,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "4b536d9aa6039190",
+        "type": "debug",
+        "z": "149fdcb088559175",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "4377ec7bbcfe64d0",
+        "type": "mongodb4",
+        "z": "149fdcb088559175",
+        "clientNode": "1607aed3dacd1b10",
+        "mode": "collection",
+        "collection": "system_logs",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "time-series",
+        "x": 490,
+        "y": 440,
+        "wires": [
+            [
+                "a3cbeede27edb39f"
+            ]
+        ]
+    },
+    {
+        "id": "e3ce51ce4f08cc44",
+        "type": "function",
+        "z": "149fdcb088559175",
+        "name": "function 12",
+        "func": "// Ambil masa sekarang dan tambah 8 jam terus (Waktu Malaysia)\nvar masaMalaysia = new Date();\nmasaMalaysia.setHours(masaMalaysia.getHours() + 8);\n\n// Bina data baru untuk MongoDB\nmsg.payload = {\n    \"sensor_id\": \"ESP32_Soil_1\",\n    \"action\": \"COMMAND_RECEIVED\",\n    \"command\": msg.payload, // Tarik arahan ON/OFF\n    \"timestamp\": masaMalaysia.toISOString().replace(\"Z\", \"\") // Buang Z supaya DB tak lari masa\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 440,
+        "wires": [
+            [
+                "4b536d9aa6039190",
+                "4377ec7bbcfe64d0"
+            ]
+        ]
+    },
+    {
+        "id": "64771a0a818a9094",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "host.docker.internal",
+        "port": 1883,
+        "clientid": "NodeRED_Gateway",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "1607aed3dacd1b10",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "",
+        "port": "",
+        "dbName": "soil_IoT_system",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "mongodb+srv://muhdazni19_db_user:Muhdazni99@cluster0.qn1kerz.mongodb.net/soil_IoT_system?appName=Cluster0",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-advanced"
+    },
+    {
+        "id": "bf11ea157165cc0e",
+        "type": "ui_group",
+        "name": "Sensor Data",
+        "tab": "b289df51aa0492f7",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b289df51aa0492f7",
+        "type": "ui_tab",
+        "name": "monitoring",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "1559aa742044a1bd",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-mongodb4": "3.4.0",
+            "node-red-dashboard": "3.6.6",
+            "node-red-contrib-aedes": "1.2.0"
+        }
+    }
+]
