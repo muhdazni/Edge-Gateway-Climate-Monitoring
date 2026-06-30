@@ -25,7 +25,7 @@ An Edge IoT Gateway-based microclimate and ambient temperature monitoring system
 
 ## 📸 System Overview
 
-![Assignment Database Diagram](images/Assignment DataBase n cloud system.png)
+![Assignment Database Diagram](<images/Assignment DataBase n cloud system.png>)
 
 ![Node-RED flow](images/Node_RED.jpg)
 
