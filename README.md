@@ -2,7 +2,7 @@
 IoT Node-RED and ESP32 project for environmental monitoring via local EMQX broke
 
 # AtmosSense IoT: Secure Climate Gateway 🌡️☁️
-BERR 2243 (Assignment)
+
 An Edge IoT Gateway-based microclimate and ambient temperature monitoring system. This project is developed for academic purposes and research at Universiti Teknikal Malaysia Melaka (UTeM), focusing on real-time telemetry, secure authentication layers, and cloud database management.
 
 ---
@@ -21,6 +21,15 @@ An Edge IoT Gateway-based microclimate and ambient temperature monitoring system
 * **Node-RED:** IoT integration platform used for data parsing and visualizing the Dashboard.
 * **MongoDB Atlas:** Cloud NoSQL database for storing historical data logs with timestamps.
 
+---
+
+## 📸 System Overview
+
+*(Note: Drag and drop your hardware circuit image here)*
+
+*(Note: Drag and drop your Node-RED Dashboard image here)*
+
+---
 
 ## ⚙️ How the System Works
 
@@ -45,4 +54,4 @@ The system architecture is divided into two main streams: the Telemetry Path (Up
 1. Clone this repository to your local machine.
 2. Open the `flows.json` file and import it into your Node-RED workspace.
 3. Ensure the EMQX service is running on `localhost` (Port 1883) with the properly configured MQTT user authentication.
-4. Upload the `.ino` code to your ESP32, ensuring the WiFi SSID and local EMQX IP settings are correctly updated.
+4. Upload the `.ino` code to your ESP32, ensuring the WiFi SSID and local EMQX IP settings are correctly updated.<img width="1408" height="768" alt="Assignment DataBase n cloud system" src="https://github.com/user-attachments/assets/b5e9b3b1-251e-4055-9283-391d3fe1a11a" />
