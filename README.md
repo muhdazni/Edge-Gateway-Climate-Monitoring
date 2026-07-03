@@ -1,25 +1,27 @@
 # Edge-Gateway-Climate-Monitoring
 IoT Node-RED and ESP32 project for environmental monitoring via local EMQX broke
 
-# AtmosSense IoT: Secure Climate Gateway 🌡️☁️
+# AtmosSense IoT: Secure Edge-to-Cloud Climate Gateway 🌡️☁️
 
-An Edge IoT Gateway-based microclimate and ambient temperature monitoring system. This project is developed for academic purposes and research at Universiti Teknikal Malaysia Melaka (UTeM), focusing on real-time telemetry, secure authentication layers, and cloud database management.
+An end-to-end cloud IoT deployment system designed for real-time microclimate monitoring. This academic project demonstrates the transition of raw environmental data from an edge microcontroller to structured NoSQL document storage via a secure Cloud Virtual Machine (VM). 
 
 ---
 
-## 🛠️ Hardware & Software Components
+## 🛠️ Hardware & Cloud Services
 
-### Hardware
+### Hardware (Edge Layer)
 * ESP32 Microcontroller (NodeMCU/DevKit)
 * DHT11 Temperature & Humidity Sensor
-* Jumper Wires
-* Breadboard
+* Jumper Wires & Breadboard
 
-### Software & Services
-* **Arduino IDE:** C++ code development environment for the ESP32.
-* **EMQX Broker (Local):** Local MQTT server for fast and secure data communication.
-* **Node-RED:** IoT integration platform used for data parsing and visualizing the Dashboard.
-* **MongoDB Atlas:** Cloud NoSQL database for storing historical data logs with timestamps.
+### Cloud & Middleware Services
+* **Public Cloud VM (e.g., Azure/AWS):** Hosts the middleware components with configured firewall rules exposing ports 1883 and 1880.
+* **EMQX MQTT Broker:** Containerized cloud broker handling secure message queuing with strict client authentication.
+* **Node-RED:** Cloud-hosted IoT middleware responsible for data parsing, logical verification, and routing.
+* **MongoDB Atlas:** Cloud NoSQL database utilizing a dual-collection schema:
+  * `device_metadata`: Stores authorized device configurations for verification.
+  * `environment_telemetry`: Optimized time-series collection for high-velocity sensor data.
+* **MongoDB Charts:** Real-time executive dashboard for live data visualization.
 
 ---
 
@@ -31,27 +33,27 @@ An Edge IoT Gateway-based microclimate and ambient temperature monitoring system
 
 ---
 
-## ⚙️ How the System Works
+## ⚙️ System Workflow
 
-The system architecture is divided into two main streams: the Telemetry Path (Uplink) and the Command Path (Downlink).
+The architecture operates on a secure bi-directional data pipeline:
 
-### 1. Telemetry Path (Data Monitoring)
-1. **Data Collection:** The DHT11 sensor reads the ambient temperature and humidity values every 5 seconds.
-2. **Secure Transmission:** The ESP32 packages the readings into a JSON format and publishes them to the `env/telemetry` topic via the local EMQX broker using authenticated credentials.
-3. **Edge Processing:** Node-RED (acting as the Edge Gateway) subscribes to the topic, parses the JSON object, and isolates the temperature and humidity values.
-4. **Visualization & Storage:** The processed data is directly displayed on visual indicators (Gauge & Chart) on the Node-RED Dashboard. Simultaneously, the system injects a timestamp and stores the record into a time-series collection in MongoDB Atlas.
+### 1. Telemetry Path (Edge to Cloud Database)
+1. **Data Acquisition:** The DHT11 sensor reads ambient temperature and humidity, and the ESP32 packages this into a JSON payload.
+2. **Secure Publishing:** The ESP32 connects via Wi-Fi and publishes the payload to the Cloud VM's EMQX broker over port 1883 using authenticated credentials.
+3. **Middleware Verification:** Node-RED (port 1880) subscribes to the telemetry topic. Before storing the data, it queries the `device_metadata` collection in MongoDB Atlas to verify the ESP32's authorization.
+4. **Time-Series Storage:** Once verified, Node-RED routes the JSON payload into the `environment_telemetry` time-series collection using Role-Based Access Control (RBAC) with write-only privileges.
+5. **Live Dashboard:** MongoDB Charts pulls data directly from the time-series collection to display a live gauge, historical line graphs, and raw data tables.
 
-### 2. Command Path (Manual Control)
-1. **Command Trigger:** The user presses the ON or OFF button on the Node-RED Dashboard interface.
-2. **Signal Distribution:** Node-RED formats the signal and publishes it to the `env/command` MQTT topic.
-3. **Hardware Execution:** The ESP32, continuously listening to the command topic, receives the message and toggles the physical LED/Relay accordingly.
-4. **System Logging:** Every button press is recorded into the MongoDB database as an audit trail.
+### 2. Command Path (Cloud to Edge Control)
+1. **Command Initiation:** A command payload is injected via the Node-RED flow to change a physical state (e.g., toggle an LED/Relay).
+2. **Message Routing:** Node-RED publishes this instruction to a specific command topic on the EMQX broker.
+3. **Hardware Execution:** The ESP32, continuously subscribed to the command topic, receives the instruction and executes the physical state change, demonstrating robust bi-directional communication.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start & Deployment
 
-1. Clone this repository to your local machine.
-2. Open the `flows.json` file and import it into your Node-RED workspace.
-3. Ensure the EMQX service is running on `localhost` (Port 1883) with the properly configured MQTT user authentication.
-4. Upload the `.ino` code to your ESP32, ensuring the WiFi SSID and local EMQX IP settings are correctly updated.
+1. Clone this repository to access the ESP32 C++ firmware (`.ino`) and Node-RED exported flow (`flows.json`).
+2. Flash the firmware to your ESP32, ensuring Wi-Fi credentials and the Public Cloud VM IP address are updated.
+3. Import `flows.json` into your Cloud Node-RED instance.
+4. Configure MongoDB Atlas with the appropriate Database Users (RBAC) and IP Access List to allow connections from your VM.
