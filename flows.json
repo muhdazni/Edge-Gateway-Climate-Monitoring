@@ -500,7 +500,7 @@
         "minPoolSize": "0",
         "maxPoolSize": "100",
         "maxIdleTimeMS": "0",
-        "uri": "mongodb+srv://muhdazni19_db_user:Muhdazni99@cluster0.qn1kerz.mongodb.net/soil_IoT_system?appName=Cluster0",
+        "uri": "mongodb+srv://<DB_USER>:<DB_PASSWORD>@cluster0.qn1kerz.mongodb.net/soil_IoT_system?appName=Cluster0",
         "advanced": "{}",
         "uriTabActive": "tab-uri-advanced"
     },
