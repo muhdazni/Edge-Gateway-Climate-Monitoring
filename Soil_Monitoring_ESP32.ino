@@ -4,14 +4,14 @@
 // ==========================================
 // 1. TETAPAN RANGKAIAN & BROKER
 // ==========================================
-const char* ssid = "Vikyolin_2.4Ghz";      // Masukkan nama WiFi/Hotspot kau
-const char* password = "OsAke19_";   // Masukkan password WiFi
-const char* mqtt_server = "192.168.0.143"; // IP laptop kau (EMQX Broker)
+const char* ssid = "YOUR_WIFI_SSID";           // WiFi / hotspot name
+const char* password = "YOUR_WIFI_PASSWORD";   // WiFi password
+const char* mqtt_server = "YOUR_BROKER_IP";    // EMQX broker IP address
 const int mqtt_port = 1883;
 
 
-const char* mqtt_user = "soil_temp";          // Username yang kau buat kat EMQX tadi
-const char* mqtt_password = "UTeM2026";
+const char* mqtt_user = "YOUR_MQTT_USERNAME";  // EMQX username
+const char* mqtt_password = "YOUR_MQTT_PASSWORD";
 // ==========================================
 // 2. TETAPAN PIN PERKAKASAN
 // ==========================================
